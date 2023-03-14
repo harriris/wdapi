@@ -1,0 +1,20 @@
+service: wdapi
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: java11
+  region: eu-north-1 # Stockholm
+
+package:
+  artifact: target/wdapi-0.0.1-SNAPSHOT.jar
+
+functions:
+  restapi:
+    handler: com.github.harriris.wdapi.StreamLambdaHandler::handleRequest
+    timeout: 30
+    memorySize: 1024
+    events:
+      - http:
+          path: /{proxy+}
+          method: GET
