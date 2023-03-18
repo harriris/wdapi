@@ -17,24 +17,23 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/v1", produces = MediaType.APPLICATION_JSON_VALUE)
-public class DisruptionInfoResource {
-    private HslRouteApiService hslRouteApiService;
+public class DisruptionInfoController {
+    private final HslRouteApiService hslRouteApiService;
 
-    public DisruptionInfoResource() {
-        hslRouteApiService = new HslRouteApiService();
+    public DisruptionInfoController(HslRouteApiService hslRouteApiService) {
+        this.hslRouteApiService = hslRouteApiService;
     }
 
     @Validated
     @GetMapping("/itineraries")
-    public List<?> itineraries(@RequestParam double sLat,
-                               @RequestParam double sLon,
-                               @RequestParam double eLat,
-                               @RequestParam double eLon) {
+    public ArrayList<HslItinerary> itineraries(@RequestParam double sLat,
+                                               @RequestParam double sLon,
+                                               @RequestParam double eLat,
+                                               @RequestParam double eLon) {
         ArrayList<HslItinerary> hslItineraries = hslRouteApiService
                 .getItineraries(new Point2D.Double(sLat, sLon), new Point2D.Double(eLat, eLon));
         if (hslItineraries.isEmpty()) {
@@ -45,15 +44,11 @@ public class DisruptionInfoResource {
 
     @Validated
     @GetMapping("/disruptions")
-    public List<Disruption> disruptions(@RequestParam double sLat,
-                                        @RequestParam double sLon,
-                                        @RequestParam double eLat,
-                                        @RequestParam double eLon) {
-        ArrayList<HslItinerary> hslItineraries = hslRouteApiService
-                .getItineraries(new Point2D.Double(sLat, sLon), new Point2D.Double(eLat, eLon));
-        if (hslItineraries.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No itineraries found");
-        }
+    public ArrayList<Disruption> disruptions(@RequestParam double sLat,
+                                             @RequestParam double sLon,
+                                             @RequestParam double eLat,
+                                             @RequestParam double eLon) {
+        ArrayList<HslItinerary> hslItineraries = this.itineraries(sLat, sLon, eLat, eLon);
         ArrayList<HslDisruption> hslDisruptions = hslRouteApiService.getDisruptions(true);
         return this.getAffectingDisruptions(hslItineraries, hslDisruptions);
     }

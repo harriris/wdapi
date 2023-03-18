@@ -9,6 +9,17 @@ public class HslDisruption {
     private Long effectiveEndDate;
     private HslTrip trip;
     private HslRoute route;
+
+    public HslDisruption() {}
+
+    public HslDisruption(String alertDescriptionText, Long effectiveStartDate, Long effectiveEndDate,
+                         HslTrip trip, HslRoute route) {
+        this.alertDescriptionText = alertDescriptionText;
+        this.effectiveStartDate = effectiveStartDate;
+        this.effectiveEndDate = effectiveEndDate;
+        this.trip = trip;
+        this.route = route;
+    }
     
     public Long startTime() {
         if (this.getEffectiveStartDate() == null) {

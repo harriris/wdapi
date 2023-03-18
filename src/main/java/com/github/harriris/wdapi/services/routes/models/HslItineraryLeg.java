@@ -10,6 +10,16 @@ public class HslItineraryLeg {
     private HslTrip trip;
     private HslRoute route;
 
+    public HslItineraryLeg() {}
+
+    public HslItineraryLeg(Long startTime, Long endTime, String mode, HslTrip trip, HslRoute route) {
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.mode = mode;
+        this.trip = trip;
+        this.route = route;
+    }
+
     public Long getStartTime() {
         return startTime;
     }

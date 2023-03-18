@@ -6,6 +6,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class HslRoute {
     private String gtfsId;
 
+    public HslRoute() {}
+
+    public HslRoute(String gtfsId) {
+        this.gtfsId = gtfsId;
+    }
+
     public void setGtfsId(String gtfsId) {
         this.gtfsId = gtfsId;
     }

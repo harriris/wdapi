@@ -8,6 +8,12 @@ import java.util.List;
 public class HslItinerary {
     private List<HslItineraryLeg> legs;
 
+    public HslItinerary() {}
+
+    public HslItinerary(List<HslItineraryLeg> legs) {
+        this.legs = legs;
+    }
+
     public List<HslItineraryLeg> getLegs() {
         return legs;
     }
