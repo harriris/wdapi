@@ -16,6 +16,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .serverless
+.env
 
 # Log files
 jxl.log

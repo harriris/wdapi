@@ -3,7 +3,7 @@ frameworkVersion: '3'
 
 provider:
   name: aws
-  runtime: java11
+  runtime: java17
   region: eu-north-1 # Stockholm
 
 package:

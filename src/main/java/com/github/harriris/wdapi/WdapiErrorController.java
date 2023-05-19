@@ -16,16 +16,16 @@ import javax.servlet.http.HttpServletRequest;
 public class WdapiErrorController implements ErrorController {
     @RequestMapping("/error")
     public ResponseEntity<JsonResponse>handleError(HttpServletRequest request) {
-        HttpStatus status;
-        Object rawStatus = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+        final HttpStatus status;
+        final Object rawStatus = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
         if (rawStatus == null) {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         } else {
-            status = HttpStatus.valueOf(Integer.valueOf(rawStatus.toString()));
+            status = HttpStatus.valueOf(Integer.parseInt(rawStatus.toString()));
         }
 
         String message = null;
-        Object rawMessage = request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
+        final Object rawMessage = request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
         if (rawMessage != null) {
             message = rawMessage.toString();
         }

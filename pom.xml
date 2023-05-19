@@ -14,7 +14,7 @@
 	<name>wdapi</name>
 	<description>Waltti Disruptions API</description>
 	<properties>
-		<java.version>11</java.version> <!-- Newest Java runtime in AWS Lambda is 11 -->
+		<java.version>17</java.version> <!-- Newest Java runtime in AWS Lambda is 17 -->
 	</properties>
 
 	<dependencies>
@@ -69,6 +69,11 @@
 				<configuration>
 					<classifier>exec</classifier>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.3.1</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

@@ -5,20 +5,4 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class HslItinerary {
-    private List<HslItineraryLeg> legs;
-
-    public HslItinerary() {}
-
-    public HslItinerary(List<HslItineraryLeg> legs) {
-        this.legs = legs;
-    }
-
-    public List<HslItineraryLeg> getLegs() {
-        return legs;
-    }
-
-    public void setLegs(List<HslItineraryLeg> legs) {
-        this.legs = legs;
-    }
-}
+public record HslItinerary(List<HslItineraryLeg> legs) { }

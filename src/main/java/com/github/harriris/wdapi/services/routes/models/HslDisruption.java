@@ -3,87 +3,32 @@ package com.github.harriris.wdapi.services.routes.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class HslDisruption {
-    private String alertDescriptionText;
-    private Long effectiveStartDate;
-    private Long effectiveEndDate;
-    private HslTrip trip;
-    private HslRoute route;
-
-    public HslDisruption() {}
-
-    public HslDisruption(String alertDescriptionText, Long effectiveStartDate, Long effectiveEndDate,
-                         HslTrip trip, HslRoute route) {
-        this.alertDescriptionText = alertDescriptionText;
-        this.effectiveStartDate = effectiveStartDate;
-        this.effectiveEndDate = effectiveEndDate;
-        this.trip = trip;
-        this.route = route;
-    }
+public record HslDisruption(String alertDescriptionText, Long effectiveStartDate, Long effectiveEndDate,
+                            HslTrip trip, HslRoute route) {
     
     public Long startTime() {
-        if (this.getEffectiveStartDate() == null) {
+        if (this.effectiveStartDate == null) {
             return null;
         }
-        return this.getEffectiveStartDate() * 1000;
+        return this.effectiveStartDate * 1000;
     }
 
     public Long endTime() {
-        if (this.getEffectiveEndDate() == null) {
+        if (this.effectiveEndDate == null) {
             return null;
         }
-        return this.getEffectiveEndDate() * 1000;
+        return this.effectiveEndDate * 1000;
     }
 
     public boolean legIsDisrupted(HslItineraryLeg hslLeg) {
-        if (hslLeg.getRoute() == null || this.getRoute() == null) {
+        if (hslLeg.route() == null || this.route == null) {
             return false;
         }
         if (this.startTime() == null || this.endTime() == null) {
             return false;
         }
-        return hslLeg.getRoute().getGtfsId().equals(this.getRoute().getGtfsId())
-                && (hslLeg.getStartTime() >= this.startTime() && hslLeg.getStartTime() <= this.endTime()
-                    || hslLeg.getEndTime() >= this.startTime() && hslLeg.getEndTime() <= this.endTime());
-    }
-
-    public String getAlertDescriptionText() {
-        return alertDescriptionText;
-    }
-
-    public void setAlertDescriptionText(String alertDescriptionText) {
-        this.alertDescriptionText = alertDescriptionText;
-    }
-
-    public Long getEffectiveStartDate() {
-        return effectiveStartDate;
-    }
-
-    public void setEffectiveStartDate(Long effectiveStartDate) {
-        this.effectiveStartDate = effectiveStartDate;
-    }
-
-    public Long getEffectiveEndDate() {
-        return effectiveEndDate;
-    }
-
-    public void setEffectiveEndDate(Long effectiveEndDate) {
-        this.effectiveEndDate = effectiveEndDate;
-    }
-
-    public HslTrip getTrip() {
-        return trip;
-    }
-
-    public void setTrip(HslTrip trip) {
-        this.trip = trip;
-    }
-
-    public HslRoute getRoute() {
-        return route;
-    }
-
-    public void setRoute(HslRoute route) {
-        this.route = route;
+        return hslLeg.route().gtfsId().equals(this.route.gtfsId())
+                && (hslLeg.startTime() >= this.startTime() && hslLeg.startTime() <= this.endTime()
+                    || hslLeg.endTime() >= this.startTime() && hslLeg.endTime() <= this.endTime());
     }
 }

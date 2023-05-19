@@ -58,15 +58,15 @@ public class DisruptionInfoController {
         ArrayList<Disruption> affectingDisruptions = new ArrayList<>();
 
         ArrayList<HslItineraryLeg> legs = hslItineraries.stream()
-                .flatMap(hslItinerary -> hslItinerary.getLegs().stream())
+                .flatMap(hslItinerary -> hslItinerary.legs().stream())
                 .collect(Collectors.toCollection(ArrayList::new));
 
         legs.forEach(hslLeg -> hslDisruptions.forEach(hslDisruption -> {
             if (hslDisruption.legIsDisrupted(hslLeg)) {
                 final DisruptedLeg disruptedLeg = new DisruptedLeg(
-                        hslLeg.getStartTime(), hslLeg.getEndTime(), hslLeg.getMode(), hslLeg.getRoute().getGtfsId()
+                        hslLeg.startTime(), hslLeg.endTime(), hslLeg.mode(), hslLeg.route().gtfsId()
                 );
-                final Disruption disruption = new Disruption(disruptedLeg, hslDisruption.getAlertDescriptionText());
+                final Disruption disruption = new Disruption(disruptedLeg, hslDisruption.alertDescriptionText());
                 affectingDisruptions.add(disruption);
             }
         }));
