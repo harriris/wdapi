@@ -5,6 +5,7 @@ import com.github.harriris.wdapi.restapi.models.DisruptedLeg;
 import com.github.harriris.wdapi.services.routes.models.HslDisruption;
 import com.github.harriris.wdapi.services.routes.models.HslItinerary;
 import com.github.harriris.wdapi.services.routes.models.HslItineraryLeg;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -22,11 +23,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(value = "/api/v1", produces = MediaType.APPLICATION_JSON_VALUE)
 public class DisruptionInfoController {
-    private final HslRouteApiService hslRouteApiService;
-
-    public DisruptionInfoController(HslRouteApiService hslRouteApiService) {
-        this.hslRouteApiService = hslRouteApiService;
-    }
+    @Autowired
+    private HslRouteApiService hslRouteApiService;
 
     @Validated
     @GetMapping("/itineraries")
@@ -64,7 +62,8 @@ public class DisruptionInfoController {
         legs.forEach(hslLeg -> hslDisruptions.forEach(hslDisruption -> {
             if (hslDisruption.legIsDisrupted(hslLeg)) {
                 final DisruptedLeg disruptedLeg = new DisruptedLeg(
-                        hslLeg.startTime(), hslLeg.endTime(), hslLeg.mode(), hslLeg.route().gtfsId()
+                        hslLeg.getStartTimeISOString(), hslLeg.getEndTimeISOString(), hslLeg.mode(),
+                        hslLeg.route().gtfsId()
                 );
                 final Disruption disruption = new Disruption(disruptedLeg, hslDisruption.alertDescriptionText());
                 affectingDisruptions.add(disruption);
