@@ -28,8 +28,9 @@ public class DisruptionInfoController {
                                                @RequestParam double sLon,
                                                @RequestParam double eLat,
                                                @RequestParam double eLon) {
-        ArrayList<HslItinerary> hslItineraries = hslRouteApiService
-                .getItineraries(new Point2D.Double(sLat, sLon), new Point2D.Double(eLat, eLon));
+        ArrayList<HslItinerary> hslItineraries = hslRouteApiService.getItineraries(
+                new Point2D.Double(sLat, sLon), new Point2D.Double(eLat, eLon)
+        );
         if (hslItineraries.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No itineraries found");
         }
