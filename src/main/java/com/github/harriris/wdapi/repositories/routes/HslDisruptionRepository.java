@@ -15,6 +15,22 @@ import java.util.Objects;
 public class HslDisruptionRepository {
     private final HttpGraphQlClient graphQlClient;
 
+    private static final String FIND_ALL_QUERY = """
+                    {
+                        alerts(severityLevel: [WARNING, SEVERE]) {
+                            alertDescriptionText
+                            effectiveStartDate
+                            effectiveEndDate
+                            trip {
+                                gtfsId
+                            }
+                            route {
+                                gtfsId
+                            }
+                        }
+                    }
+                    """;
+
     @Autowired
     public HslDisruptionRepository(@Value("${digitransit.api.key}") String apiKey,
                                    @Value("${digitransit.api.url}") String apiUrl) {
@@ -29,22 +45,7 @@ public class HslDisruptionRepository {
     }
 
     public ArrayList<HslDisruption> findAll() {
-        String query = """
-                {
-                    alerts(severityLevel: [WARNING, SEVERE]) {
-                        alertDescriptionText
-                        effectiveStartDate
-                        effectiveEndDate
-                        trip {
-                            gtfsId
-                        }
-                        route {
-                            gtfsId
-                        }
-                    }
-                }
-                """;
-        return new ArrayList<>(Objects.requireNonNull(this.graphQlClient.document(query)
+        return new ArrayList<>(Objects.requireNonNull(this.graphQlClient.document(FIND_ALL_QUERY)
                 .retrieve("alerts")
                 .toEntityList(HslDisruption.class)
                 .block()));

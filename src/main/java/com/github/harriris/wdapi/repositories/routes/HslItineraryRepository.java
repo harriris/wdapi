@@ -16,6 +16,31 @@ import java.util.Objects;
 public class HslItineraryRepository {
     private final HttpGraphQlClient graphQlClient;
 
+    private static final String FIND_BY_COORDINATES_QUERY = """
+            {
+                plan(
+                    from: {lat: %s, lon: %s}
+                    to: {lat: %s, lon: %s}
+                    numItineraries: 10
+                    transportModes: [{mode: WALK}, {mode: BUS}]
+                ) {
+                    itineraries {
+                        legs {
+                            startTime
+                            endTime
+                            mode
+                            trip {
+                                gtfsId
+                            }
+                            route {
+                                gtfsId
+                            }
+                        }
+                    }
+                }
+            }
+            """;
+
     @Autowired
     public HslItineraryRepository(@Value("${digitransit.api.key}") String apiKey,
                                   @Value("${digitransit.api.url}") String apiUrl) {
@@ -30,32 +55,8 @@ public class HslItineraryRepository {
     }
 
     public ArrayList<HslItinerary> findByCoordinates(Point2D.Double startCoordinates, Point2D.Double endCoordinates) {
-        String queryTemplate = """
-                {
-                    plan(
-                        from: {lat: %s, lon: %s}
-                        to: {lat: %s, lon: %s}
-                        numItineraries: 10
-                        transportModes: [{mode: WALK}, {mode: BUS}]
-                    ) {
-                        itineraries {
-                            legs {
-                                startTime
-                                endTime
-                                mode
-                                trip {
-                                    gtfsId
-                                }
-                                route {
-                                    gtfsId
-                                }
-                            }
-                        }
-                    }
-                }
-                """;
         String query = String.format(
-                queryTemplate, startCoordinates.x, startCoordinates.y, endCoordinates.x, endCoordinates.y
+                FIND_BY_COORDINATES_QUERY, startCoordinates.x, startCoordinates.y, endCoordinates.x, endCoordinates.y
         );
         return new ArrayList<>(Objects.requireNonNull(this.graphQlClient.document(query)
                 .retrieve("plan.itineraries")
