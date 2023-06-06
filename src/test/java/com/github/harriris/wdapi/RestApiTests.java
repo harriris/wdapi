@@ -38,13 +38,13 @@ public class RestApiTests {
     );
 
     @Test
-    public void itinerariesMissingAllParams() throws Exception {
+    public void itineraries_MissingAllParams() throws Exception {
         this.mockMvc.perform(get("/api/v1/itineraries"))
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
     @Test
-    public void itinerariesMissingPartialParams() throws Exception {
+    public void itineraries_MissingPartialParams() throws Exception {
         final String partialParamsUrl = String.format(
                 "/api/v1/itineraries?sLon=%s&eLat=%s", StaticTestData.START_POINT.y, StaticTestData.END_POINT.x
         );
@@ -52,13 +52,13 @@ public class RestApiTests {
     }
 
     @Test
-    public void disruptionsMissingAllParams() throws Exception {
+    public void disruptions_MissingAllParams() throws Exception {
         this.mockMvc.perform(get("/api/v1/disruptions"))
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
     @Test
-    public void disruptionsMissingPartialParams() throws Exception {
+    public void disruptions_MissingPartialParams() throws Exception {
         final String partialParamsUrl = String.format(
                 "/api/v1/disruptions?sLon=%s&eLat=%s", StaticTestData.START_POINT.y, StaticTestData.END_POINT.x
         );
@@ -66,28 +66,28 @@ public class RestApiTests {
     }
 
     @Test
-    public void itinerariesNotFound() throws Exception {
+    public void itineraries_NotFound() throws Exception {
         when(this.hslRouteApiService.getItineraries(any(), any())).thenReturn(new ArrayList<>());
         this.mockMvc.perform(get(ITINERARIES_URL).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
     }
 
     @Test
-    public void itinerariesFound() throws Exception {
+    public void itineraries_Success() throws Exception {
         when(this.hslRouteApiService.getItineraries(any(), any())).thenReturn(StaticTestData.HSL_ITINERARIES);
         this.mockMvc.perform(get(ITINERARIES_URL).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void disruptionsNotFound() throws Exception {
+    public void disruptions_NotFound() throws Exception {
         when(this.hslRouteApiService.getAffectingDisruptions(any(), any())).thenReturn(new ArrayList<>());
         this.mockMvc.perform(get(DISRUPTIONS_URL).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
     }
 
     @Test
-    public void disruptionsFound() throws Exception {
+    public void disruptions_Success() throws Exception {
         when(this.hslRouteApiService.getAffectingDisruptions(any(), any())).thenReturn(StaticTestData.DISRUPTIONS);
         this.mockMvc.perform(get(DISRUPTIONS_URL).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());

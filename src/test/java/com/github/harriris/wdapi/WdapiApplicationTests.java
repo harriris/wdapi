@@ -18,7 +18,7 @@ class WdapiApplicationTests {
 	private WdapiErrorController wdapiErrorController;
 
 	@Test
-	void controllersLoad() {
+	void controllersLoad_Success() {
 		assertThat(disruptionInfoController).isNotNull();
 		assertThat(hslRouteApiService).isNotNull();
 		assertThat(wdapiErrorController).isNotNull();
