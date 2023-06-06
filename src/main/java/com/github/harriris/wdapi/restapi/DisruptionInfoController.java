@@ -1,10 +1,7 @@
 package com.github.harriris.wdapi.restapi;
 
 import com.github.harriris.wdapi.restapi.models.Disruption;
-import com.github.harriris.wdapi.restapi.models.DisruptedLeg;
-import com.github.harriris.wdapi.services.routes.models.HslDisruption;
 import com.github.harriris.wdapi.services.routes.models.HslItinerary;
-import com.github.harriris.wdapi.services.routes.models.HslItineraryLeg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/v1", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -46,30 +42,12 @@ public class DisruptionInfoController {
                                              @RequestParam double sLon,
                                              @RequestParam double eLat,
                                              @RequestParam double eLon) {
-        ArrayList<HslItinerary> hslItineraries = this.itineraries(sLat, sLon, eLat, eLon);
-        ArrayList<HslDisruption> hslDisruptions = hslRouteApiService.getDisruptions(true);
-        return this.getAffectingDisruptions(hslItineraries, hslDisruptions);
-    }
-
-    private ArrayList<Disruption> getAffectingDisruptions(ArrayList<HslItinerary> hslItineraries,
-                                                          ArrayList<HslDisruption> hslDisruptions) {
-        ArrayList<Disruption> affectingDisruptions = new ArrayList<>();
-
-        ArrayList<HslItineraryLeg> legs = hslItineraries.stream()
-                .flatMap(hslItinerary -> hslItinerary.legs().stream())
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        legs.forEach(hslLeg -> hslDisruptions.forEach(hslDisruption -> {
-            if (hslDisruption.legIsDisrupted(hslLeg)) {
-                final DisruptedLeg disruptedLeg = new DisruptedLeg(
-                        hslLeg.getStartTimeISOString(), hslLeg.getEndTimeISOString(), hslLeg.mode(),
-                        hslLeg.route().gtfsId()
-                );
-                final Disruption disruption = new Disruption(disruptedLeg, hslDisruption.alertDescriptionText());
-                affectingDisruptions.add(disruption);
-            }
-        }));
-
+        ArrayList<Disruption> affectingDisruptions = hslRouteApiService.getAffectingDisruptions(
+                new Point2D.Double(sLat, sLon), new Point2D.Double(eLat, eLon)
+        );
+        if (affectingDisruptions.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No disruptions found");
+        }
         return affectingDisruptions;
     }
 }

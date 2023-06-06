@@ -2,7 +2,6 @@ package com.github.harriris.wdapi;
 
 import com.github.harriris.wdapi.restapi.DisruptionInfoController;
 import com.github.harriris.wdapi.services.routes.HslRouteApiService;
-import com.github.harriris.wdapi.services.routes.models.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -55,6 +53,20 @@ public class RestApiTests {
     }
 
     @Test
+    public void disruptionsMissingAllParams() throws Exception {
+        this.mockMvc.perform(get("/api/v1/disruptions"))
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @Test
+    public void disruptionsMissingPartialParams() throws Exception {
+        final String partialParamsUrl = String.format(
+                "/api/v1/disruptions?sLon=%s&eLat=%s", StaticTestData.START_POINT.y, StaticTestData.END_POINT.x
+        );
+        this.mockMvc.perform(get(partialParamsUrl)).andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @Test
     public void itinerariesNotFound() throws Exception {
         when(this.hslRouteApiService.getItineraries(any(), any())).thenReturn(new ArrayList<>());
         this.mockMvc.perform(get(ITINERARIES_URL).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
@@ -63,31 +75,22 @@ public class RestApiTests {
 
     @Test
     public void itinerariesFound() throws Exception {
-        when(this.hslRouteApiService.getItineraries(any(), any())).thenReturn(StaticTestData.ITINERARIES);
+        when(this.hslRouteApiService.getItineraries(any(), any())).thenReturn(StaticTestData.HSL_ITINERARIES);
         this.mockMvc.perform(get(ITINERARIES_URL).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void disruptionsNotFound() throws Exception {
-        when(this.hslRouteApiService.getItineraries(any(), any())).thenReturn(new ArrayList<>());
-        when(this.hslRouteApiService.getDisruptions(anyBoolean())).thenReturn(new ArrayList<>());
+        when(this.hslRouteApiService.getAffectingDisruptions(any(), any())).thenReturn(new ArrayList<>());
         this.mockMvc.perform(get(DISRUPTIONS_URL).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
     }
 
     @Test
     public void disruptionsFound() throws Exception {
-        when(this.hslRouteApiService.getItineraries(any(), any())).thenReturn(StaticTestData.ITINERARIES);
-        when(this.hslRouteApiService.getDisruptions(anyBoolean())).thenReturn(StaticTestData.DISRUPTIONS);
+        when(this.hslRouteApiService.getAffectingDisruptions(any(), any())).thenReturn(StaticTestData.DISRUPTIONS);
         this.mockMvc.perform(get(DISRUPTIONS_URL).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    public void disruptionsWithoutItineraries() throws Exception {
-        when(this.hslRouteApiService.getItineraries(any(), any())).thenReturn(new ArrayList<>());
-        this.mockMvc.perform(get(DISRUPTIONS_URL).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
-                .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
     }
 }

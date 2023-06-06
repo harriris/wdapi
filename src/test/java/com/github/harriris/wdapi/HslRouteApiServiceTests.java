@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.harriris.wdapi.repositories.routes.HslDisruptionRepository;
 import com.github.harriris.wdapi.repositories.routes.HslItineraryRepository;
+import com.github.harriris.wdapi.restapi.models.Disruption;
 import com.github.harriris.wdapi.services.routes.HslRouteApiService;
 import com.github.harriris.wdapi.services.routes.models.HslDisruption;
 import com.github.harriris.wdapi.services.routes.models.HslItinerary;
@@ -29,38 +30,68 @@ public class HslRouteApiServiceTests {
     private HslDisruptionRepository hslDisruptionRepository;
 
     @Test
-    public void getItineraries() {
-        when(hslItineraryRepository.findByCoordinates(any(), any())).thenReturn(StaticTestData.ITINERARIES);
+    public void getItineraries_Success() {
+        when(hslItineraryRepository.findByCoordinates(any(), any())).thenReturn(StaticTestData.HSL_ITINERARIES);
         ArrayList<HslItinerary> itineraries = hslRouteApiService
                 .getItineraries(StaticTestData.START_POINT, StaticTestData.END_POINT);
-        assertThat(itineraries.size()).isEqualTo(StaticTestData.ITINERARIES.size());
+        assertThat(itineraries.size()).isEqualTo(StaticTestData.HSL_ITINERARIES.size());
     }
 
     @Test
-    public void getDisruptionsRoutesNotRequired() {
-        when(hslDisruptionRepository.findAll()).thenReturn(StaticTestData.DISRUPTIONS);
+    public void getDisruptionsRoutesNotRequired_Success() {
+        when(hslDisruptionRepository.findAll()).thenReturn(StaticTestData.HSL_DISRUPTIONS);
         ArrayList<HslDisruption> disruptions = hslRouteApiService.getDisruptions(false);
-        assertThat(disruptions.size()).isEqualTo(StaticTestData.DISRUPTIONS.size());
+        assertThat(disruptions.size()).isEqualTo(StaticTestData.HSL_DISRUPTIONS.size());
     }
 
     @Test
-    public void getDisruptionsRoutesRequired() {
-        when(hslDisruptionRepository.findAll()).thenReturn(StaticTestData.DISRUPTIONS);
+    public void getDisruptionsRoutesRequired_Success() {
+        when(hslDisruptionRepository.findAll()).thenReturn(StaticTestData.HSL_DISRUPTIONS);
         ArrayList<HslDisruption> disruptions = hslRouteApiService.getDisruptions(true);
-        assertThat(disruptions.size()).isEqualTo(StaticTestData.DISRUPTIONS.size());
+        assertThat(disruptions.size()).isEqualTo(StaticTestData.HSL_DISRUPTIONS.size());
     }
 
     @Test
     public void getDisruptionsRoutesNotRequired_RouteMissing() {
-        when(hslDisruptionRepository.findAll()).thenReturn(StaticTestData.DISRUPTIONS_WITHOUT_ROUTE);
+        when(hslDisruptionRepository.findAll()).thenReturn(StaticTestData.HSL_DISRUPTIONS_WITHOUT_ROUTE);
         ArrayList<HslDisruption> disruptions = hslRouteApiService.getDisruptions(false);
-        assertThat(disruptions.size()).isEqualTo(StaticTestData.DISRUPTIONS_WITHOUT_ROUTE.size());
+        assertThat(disruptions.size()).isEqualTo(StaticTestData.HSL_DISRUPTIONS_WITHOUT_ROUTE.size());
     }
 
     @Test
     public void getDisruptionsRoutesRequired_RouteMissing() {
-        when(hslDisruptionRepository.findAll()).thenReturn(StaticTestData.DISRUPTIONS_WITHOUT_ROUTE);
+        when(hslDisruptionRepository.findAll()).thenReturn(StaticTestData.HSL_DISRUPTIONS_WITHOUT_ROUTE);
         ArrayList<HslDisruption> disruptions = hslRouteApiService.getDisruptions(true);
-        assertThat(disruptions.size()).isEqualTo(StaticTestData.DISRUPTIONS_WITHOUT_ROUTE.size() - 1);
+        assertThat(disruptions.size()).isEqualTo(StaticTestData.HSL_DISRUPTIONS_WITHOUT_ROUTE.size() - 1);
+    }
+
+    @Test
+    public void getAffectingDisruptions_Success() {
+        when(hslItineraryRepository.findByCoordinates(any(), any())).thenReturn(StaticTestData.HSL_ITINERARIES);
+        when(hslDisruptionRepository.findAll()).thenReturn(StaticTestData.HSL_DISRUPTIONS);
+        ArrayList<Disruption> disruptions = hslRouteApiService.getAffectingDisruptions(
+                StaticTestData.START_POINT, StaticTestData.END_POINT
+        );
+        assertThat(disruptions.size()).isEqualTo(StaticTestData.HSL_DISRUPTIONS.size());
+    }
+
+    @Test
+    public void getAffectingDisruptions_ItinerariesNotFound() {
+        when(hslItineraryRepository.findByCoordinates(any(), any())).thenReturn(new ArrayList<>());
+        when(hslDisruptionRepository.findAll()).thenReturn(StaticTestData.HSL_DISRUPTIONS);
+        ArrayList<Disruption> disruptions = hslRouteApiService.getAffectingDisruptions(
+                StaticTestData.START_POINT, StaticTestData.END_POINT
+        );
+        assertThat(disruptions.size()).isEqualTo(0);
+    }
+
+    @Test
+    public void getAffectingDisruptions_DisruptionsNotFound() {
+        when(hslItineraryRepository.findByCoordinates(any(), any())).thenReturn(StaticTestData.HSL_ITINERARIES);
+        when(hslDisruptionRepository.findAll()).thenReturn(new ArrayList<>());
+        ArrayList<Disruption> disruptions = hslRouteApiService.getAffectingDisruptions(
+                StaticTestData.START_POINT, StaticTestData.END_POINT
+        );
+        assertThat(disruptions.size()).isEqualTo(0);
     }
 }
