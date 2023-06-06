@@ -15,6 +15,7 @@ public class StaticTestData {
 
     public static final HslRoute ROUTE_0 = new HslRoute("OULU:666");
     public static final HslRoute ROUTE_1 = new HslRoute("OULU:999");
+
     public static final List<HslItineraryLeg> LEGS_0 = List.of(
             new HslItineraryLeg(1679077257000L, 1679077342000L, "WALK", null, null),
             new HslItineraryLeg(1679078820000L, 1679079480000L, "BUS", null, ROUTE_0)
@@ -23,6 +24,7 @@ public class StaticTestData {
             new HslItineraryLeg(1679078406000L, 1679078473000L, "WALK", null, null),
             new HslItineraryLeg(1679079360000L, 1679080320000L, "BUS", null, ROUTE_1)
     );
+    
     public static final ArrayList<HslItinerary> ITINERARIES = new ArrayList<>(List.of(
             new HslItinerary(LEGS_0), new HslItinerary(LEGS_1)
     ));
