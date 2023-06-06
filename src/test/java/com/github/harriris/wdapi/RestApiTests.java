@@ -12,7 +12,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,38 +29,16 @@ public class RestApiTests {
     @MockBean
     private HslRouteApiService hslRouteApiService;
 
-    private static final Point2D.Double START_POINT = new Point2D.Double(65.05403708414987, 25.46518359145660);
-    private static final Point2D.Double END_POINT = new Point2D.Double(65.06192653071253, 25.43950280497612);
-
-    private static final HslRoute ROUTE_0 = new HslRoute("OULU:666");
-    private static final HslRoute ROUTE_1 = new HslRoute("OULU:999");
-    private static final List<HslItineraryLeg> LEGS_0 = List.of(
-            new HslItineraryLeg(1679077257000L, 1679077342000L, "WALK", null, null),
-            new HslItineraryLeg(1679078820000L, 1679079480000L, "BUS", null, ROUTE_0)
+    private static final String ITINERARIES_URL = String.format(
+            "/api/v1/itineraries?sLat=%s&sLon=%s&eLat=%s&eLon=%s",
+            StaticTestData.START_POINT.x, StaticTestData.START_POINT.y,
+            StaticTestData.END_POINT.x, StaticTestData.END_POINT.y
     );
-    private static final List<HslItineraryLeg> LEGS_1 = List.of(
-            new HslItineraryLeg(1679078406000L, 1679078473000L, "WALK", null, null),
-            new HslItineraryLeg(1679079360000L, 1679080320000L, "BUS", null, ROUTE_1)
+    private static final String DISRUPTIONS_URL = String.format(
+            "/api/v1/disruptions?sLat=%s&sLon=%s&eLat=%s&eLon=%s",
+            StaticTestData.START_POINT.x, StaticTestData.START_POINT.y,
+            StaticTestData.END_POINT.x, StaticTestData.END_POINT.y
     );
-    private static final ArrayList<HslItinerary> ITINERARIES = new ArrayList<>(List.of(
-            new HslItinerary(LEGS_0), new HslItinerary(LEGS_1)
-    ));
-    private static final ArrayList<HslDisruption> DISRUPTIONS = new ArrayList<>(List.of(
-            new HslDisruption(
-                    "Pysäkki A poissa käytöstä väliaikaisesti",
-                    1679077257000L, 1679077342000L,
-                    null, ROUTE_0
-            ),
-            new HslDisruption(
-                    "Pysäkki B poissa käytöstä väliaikaisesti",
-                    1679079360000L, 1679080320000L,
-                    null, ROUTE_1
-            )
-    ));
-    private static final String ITINERARIES_URL = String.format("/api/v1/itineraries?sLat=%s&sLon=%s&eLat=%s&eLon=%s",
-                                                                START_POINT.x, START_POINT.y, END_POINT.x, END_POINT.y);
-    private static final String DISRUPTIONS_URL = String.format("/api/v1/disruptions?sLat=%s&sLon=%s&eLat=%s&eLon=%s",
-                                                                START_POINT.x, START_POINT.y, END_POINT.x, END_POINT.y);
 
     @Test
     public void itinerariesMissingAllParams() throws Exception {
@@ -71,7 +48,9 @@ public class RestApiTests {
 
     @Test
     public void itinerariesMissingPartialParams() throws Exception {
-        final String partialParamsUrl = String.format("/api/v1/itineraries?sLon=%s&eLat=%s", START_POINT.y, END_POINT.x);
+        final String partialParamsUrl = String.format(
+                "/api/v1/itineraries?sLon=%s&eLat=%s", StaticTestData.START_POINT.y, StaticTestData.END_POINT.x
+        );
         this.mockMvc.perform(get(partialParamsUrl)).andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
@@ -84,7 +63,7 @@ public class RestApiTests {
 
     @Test
     public void itinerariesFound() throws Exception {
-        when(this.hslRouteApiService.getItineraries(any(), any())).thenReturn(ITINERARIES);
+        when(this.hslRouteApiService.getItineraries(any(), any())).thenReturn(StaticTestData.ITINERARIES);
         this.mockMvc.perform(get(ITINERARIES_URL).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -99,8 +78,8 @@ public class RestApiTests {
 
     @Test
     public void disruptionsFound() throws Exception {
-        when(this.hslRouteApiService.getItineraries(any(), any())).thenReturn(ITINERARIES);
-        when(this.hslRouteApiService.getDisruptions(anyBoolean())).thenReturn(DISRUPTIONS);
+        when(this.hslRouteApiService.getItineraries(any(), any())).thenReturn(StaticTestData.ITINERARIES);
+        when(this.hslRouteApiService.getDisruptions(anyBoolean())).thenReturn(StaticTestData.DISRUPTIONS);
         this.mockMvc.perform(get(DISRUPTIONS_URL).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
